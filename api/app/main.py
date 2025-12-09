@@ -1,3 +1,4 @@
+import logging
 import structlog
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
@@ -5,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from .config import get_settings
 from .middleware.request_id import RequestIDMiddleware
-from .routers import menu, review, health
+from .routers import menu, review
 from .services.mcp_client import mcp_client
 from .utils.exceptions import MenuAnalyzerError
 
@@ -21,7 +22,7 @@ def configure_logging():
             structlog.processors.JSONRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(structlog, settings.log_level.upper(), structlog.INFO)
+            getattr(logging, settings.log_level.upper(), logging.INFO)
         ),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
@@ -75,7 +76,6 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 
 # Include routers
-app.include_router(health.router, tags=["Health"])
 app.include_router(menu.router, tags=["Menu"])
 app.include_router(review.router, tags=["Review"])
 
@@ -83,10 +83,9 @@ app.include_router(review.router, tags=["Review"])
 if __name__ == "__main__":
     import uvicorn
 
-    settings = get_settings()
     uvicorn.run(
         "app.main:app",
-        host=settings.api_host,
-        port=settings.api_port,
+        host="0.0.0.0",
+        port=8000,
         reload=True,
     )

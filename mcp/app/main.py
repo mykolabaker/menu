@@ -2,8 +2,6 @@ import logging
 import structlog
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 from .config import get_settings
 from .models.tool_input import ClassifyAndCalculateInput
@@ -55,17 +53,6 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
-
-
-class HealthResponse(BaseModel):
-    status: str = "healthy"
-    service: str = "mcp"
-
-
-@app.get("/health", response_model=HealthResponse)
-async def health_check() -> HealthResponse:
-    """Health check endpoint."""
-    return HealthResponse()
 
 
 @app.post(

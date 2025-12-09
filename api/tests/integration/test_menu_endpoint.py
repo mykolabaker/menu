@@ -1,15 +1,9 @@
 import pytest
 import io
 import base64
-from unittest.mock import patch, AsyncMock
-from fastapi.testclient import TestClient
+from unittest.mock import patch, AsyncMock, MagicMock
 from PIL import Image
-
-
-@pytest.fixture
-def client():
-    from app.main import app
-    return TestClient(app)
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -22,53 +16,90 @@ def sample_image_bytes():
     return buffer.getvalue()
 
 
+@pytest.fixture
+def client():
+    """Get test client."""
+    from app.main import app
+    return TestClient(app)
+
+
 class TestProcessMenuEndpoint:
-    @patch("app.routers.menu.ocr_service")
-    @patch("app.routers.menu.mcp_client")
-    def test_process_menu_success(self, mock_mcp, mock_ocr, client, sample_image_bytes):
-        """Test successful menu processing."""
-        # Mock OCR to return menu text
+    def test_process_menu_success(self, sample_image_bytes):
+        """Test successful menu processing with confidence and reasoning."""
+        # Create mocks before importing app
+        mock_ocr = MagicMock()
         mock_ocr.extract_text_batch.return_value = ["Greek Salad $9.99\nVeggie Burger $12.50"]
 
-        # Mock MCP response
+        mock_mcp = MagicMock()
         mock_mcp.classify_and_calculate = AsyncMock(return_value={
             "vegetarian_items": [
-                {"name": "Greek Salad", "price": 9.99},
-                {"name": "Veggie Burger", "price": 12.50},
+                {"name": "Greek Salad", "price": 9.99, "confidence": 0.95, "reasoning": "Contains vegetables and feta cheese"},
+                {"name": "Veggie Burger", "price": 12.50, "confidence": 0.92, "reasoning": "Plant-based burger patty"},
             ],
             "total_sum": 22.49,
         })
 
-        # Send request
-        response = client.post(
-            "/process-menu",
-            files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
-        )
+        # Patch at the point of use (the router module)
+        import app.routers.menu as menu_module
+        original_ocr = menu_module.ocr_service
+        original_mcp = menu_module.mcp_client
 
-        assert response.status_code == 200
-        data = response.json()
-        assert "vegetarian_items" in data
-        assert "total_sum" in data
-        assert data["total_sum"] == 22.49
+        try:
+            menu_module.ocr_service = mock_ocr
+            menu_module.mcp_client = mock_mcp
 
-    @patch("app.routers.menu.ocr_service")
-    @patch("app.routers.menu.mcp_client")
-    def test_process_menu_base64(self, mock_mcp, mock_ocr, client, sample_image_bytes):
+            from app.main import app
+            client = TestClient(app)
+
+            response = client.post(
+                "/process-menu",
+                files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
+            )
+
+            assert response.status_code == 200
+            data = response.json()
+            assert "vegetarian_items" in data
+            assert "total_sum" in data
+            assert data["total_sum"] == 22.49
+            assert data["vegetarian_items"][0]["confidence"] == 0.95
+            assert data["vegetarian_items"][0]["reasoning"] == "Contains vegetables and feta cheese"
+        finally:
+            menu_module.ocr_service = original_ocr
+            menu_module.mcp_client = original_mcp
+
+    def test_process_menu_base64(self, sample_image_bytes):
         """Test processing with base64 encoded images."""
         b64_image = base64.b64encode(sample_image_bytes).decode()
 
+        mock_ocr = MagicMock()
         mock_ocr.extract_text_batch.return_value = ["Pasta $10.00"]
+
+        mock_mcp = MagicMock()
         mock_mcp.classify_and_calculate = AsyncMock(return_value={
-            "vegetarian_items": [{"name": "Pasta", "price": 10.00}],
+            "vegetarian_items": [{"name": "Pasta", "price": 10.00, "confidence": 0.88, "reasoning": "Pasta dish without meat"}],
             "total_sum": 10.00,
         })
 
-        response = client.post(
-            "/process-menu",
-            json={"images": [b64_image]},
-        )
+        import app.routers.menu as menu_module
+        original_ocr = menu_module.ocr_service
+        original_mcp = menu_module.mcp_client
 
-        assert response.status_code == 200
+        try:
+            menu_module.ocr_service = mock_ocr
+            menu_module.mcp_client = mock_mcp
+
+            from app.main import app
+            client = TestClient(app)
+
+            response = client.post(
+                "/process-menu",
+                json={"images": [b64_image]},
+            )
+
+            assert response.status_code == 200
+        finally:
+            menu_module.ocr_service = original_ocr
+            menu_module.mcp_client = original_mcp
 
     def test_process_menu_no_images(self, client):
         """Test error when no images provided."""
@@ -81,11 +112,12 @@ class TestProcessMenuEndpoint:
         response = client.post("/process-menu", files=files)
         assert response.status_code == 400
 
-    @patch("app.routers.menu.ocr_service")
-    @patch("app.routers.menu.mcp_client")
-    def test_process_menu_needs_review(self, mock_mcp, mock_ocr, client, sample_image_bytes):
+    def test_process_menu_needs_review(self, sample_image_bytes):
         """Test needs_review response handling."""
+        mock_ocr = MagicMock()
         mock_ocr.extract_text_batch.return_value = ["Mushroom Risotto $14.00"]
+
+        mock_mcp = MagicMock()
         mock_mcp.classify_and_calculate = AsyncMock(return_value={
             "status": "needs_review",
             "request_id": "test-id",
@@ -96,34 +128,49 @@ class TestProcessMenuEndpoint:
             "partial_sum": 0.0,
         })
 
-        response = client.post(
-            "/process-menu",
-            files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
-        )
+        import app.routers.menu as menu_module
+        original_ocr = menu_module.ocr_service
+        original_mcp = menu_module.mcp_client
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "needs_review"
-        assert "uncertain_items" in data
+        try:
+            menu_module.ocr_service = mock_ocr
+            menu_module.mcp_client = mock_mcp
 
-    @patch("app.routers.menu.ocr_service")
-    def test_process_menu_ocr_failure(self, mock_ocr, client, sample_image_bytes):
+            from app.main import app
+            client = TestClient(app)
+
+            response = client.post(
+                "/process-menu",
+                files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
+            )
+
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "needs_review"
+            assert "uncertain_items" in data
+        finally:
+            menu_module.ocr_service = original_ocr
+            menu_module.mcp_client = original_mcp
+
+    def test_process_menu_ocr_failure(self, sample_image_bytes):
         """Test OCR failure returns 422."""
-        mock_ocr.extract_text_batch.return_value = [""]  # Empty OCR result
+        mock_ocr = MagicMock()
+        mock_ocr.extract_text_batch.return_value = [""]
 
-        response = client.post(
-            "/process-menu",
-            files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
-        )
+        import app.routers.menu as menu_module
+        original_ocr = menu_module.ocr_service
 
-        assert response.status_code == 422
+        try:
+            menu_module.ocr_service = mock_ocr
 
+            from app.main import app
+            client = TestClient(app)
 
-class TestHealthEndpoint:
-    def test_health_check(self, client):
-        """Test health check endpoint."""
-        response = client.get("/health")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "healthy"
-        assert data["service"] == "api"
+            response = client.post(
+                "/process-menu",
+                files=[("images", ("menu.jpg", sample_image_bytes, "image/jpeg"))],
+            )
+
+            assert response.status_code == 422
+        finally:
+            menu_module.ocr_service = original_ocr

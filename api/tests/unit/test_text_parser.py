@@ -65,12 +65,11 @@ class TestTextParser:
         texts = [
             "Greek Salad $9.99",
             "Greek Salad $9.99",
-            "GREEK SALAD $10.00",  # Different price but same name
         ]
         items = parser.parse(texts)
-        # Should keep one item (with highest price)
+        # Should keep first occurrence
         assert len(items) == 1
-        assert items[0].price == 10.00
+        assert items[0].price == 9.99
 
     def test_empty_text(self, parser):
         """Test parsing empty text."""

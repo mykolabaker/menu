@@ -29,3 +29,5 @@ class VegetarianItem(BaseModel):
 
     name: str
     price: float
+    confidence: float = Field(..., ge=0, le=1, description="Classification confidence score")
+    reasoning: str = Field(..., description="Brief reasoning for classification")

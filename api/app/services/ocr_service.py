@@ -3,7 +3,6 @@ import pytesseract
 from PIL import Image
 import structlog
 
-from .image_preprocessor import image_preprocessor
 from ..utils.exceptions import OCRError
 
 logger = structlog.get_logger()
@@ -34,11 +33,8 @@ class OCRService:
         start_time = time.time()
 
         try:
-            # Preprocess image
-            preprocessed = image_preprocessor.preprocess(image, request_id)
-
             # Run OCR
-            text = pytesseract.image_to_string(preprocessed, config=self.config)
+            text = pytesseract.image_to_string(image, config=self.config)
 
             duration_ms = int((time.time() - start_time) * 1000)
             log.info(

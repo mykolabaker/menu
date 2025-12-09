@@ -15,7 +15,6 @@ from ..services.mcp_client import mcp_client
 from ..services.review_store import review_store
 from ..utils.validators import (
     validate_image_count,
-    validate_image,
     decode_base64_image,
     read_upload_file,
 )
@@ -120,10 +119,15 @@ async def process_menu(
                 partial_sum=mcp_result.get("partial_sum", 0.0),
             )
 
-        # Return final result
+        # Return final result with confidence and reasoning
         return ProcessMenuResponse(
             vegetarian_items=[
-                VegetarianItem(name=item["name"], price=item["price"])
+                VegetarianItem(
+                    name=item["name"],
+                    price=item["price"],
+                    confidence=item.get("confidence", 1.0),
+                    reasoning=item.get("reasoning", ""),
+                )
                 for item in mcp_result.get("vegetarian_items", [])
             ],
             total_sum=mcp_result.get("total_sum", 0.0),
@@ -161,8 +165,7 @@ async def _get_images(
 
         for i, file in enumerate(upload_files):
             data, img = await read_upload_file(file)
-            validate_image(data, img, file.filename or f"image_{i}")
-            # Re-open image after validation
+            # Re-open image for processing
             images.append(Image.open(io.BytesIO(data)))
 
         log.debug("processed_multipart_images", count=len(images))
@@ -173,8 +176,7 @@ async def _get_images(
 
         for i, b64_str in enumerate(body.images):
             data, img = decode_base64_image(b64_str, i)
-            validate_image(data, img, f"image_{i}")
-            # Re-open image after validation
+            # Re-open image for processing
             images.append(Image.open(io.BytesIO(data)))
 
         log.debug("processed_base64_images", count=len(images))

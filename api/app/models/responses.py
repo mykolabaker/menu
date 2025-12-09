@@ -38,16 +38,3 @@ class NeedsReviewResponse(BaseModel):
     partial_sum: float = Field(..., ge=0)
 
 
-class HealthResponse(BaseModel):
-    """Health check response."""
-
-    status: str = "healthy"
-    service: str = "api"
-
-
-class ErrorResponse(BaseModel):
-    """Error response structure."""
-
-    error: str
-    detail: str | None = None
-    request_id: str | None = None
