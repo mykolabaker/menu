@@ -1,0 +1,254 @@
+{
+  "dishes": [
+    {
+      "name": "Greek Salad",
+      "is_vegetarian": true,
+      "description": "Fresh tomatoes, cucumbers, olives, and feta cheese"
+    },
+    {
+      "name": "Caesar Salad",
+      "is_vegetarian": false,
+      "description": "Contains anchovies in traditional dressing"
+    },
+    {
+      "name": "Margherita Pizza",
+      "is_vegetarian": true,
+      "description": "Tomato sauce, mozzarella, and fresh basil"
+    },
+    {
+      "name": "Pepperoni Pizza",
+      "is_vegetarian": false,
+      "description": "Contains pepperoni (pork/beef)"
+    },
+    {
+      "name": "Veggie Burger",
+      "is_vegetarian": true,
+      "description": "Plant-based patty with vegetables"
+    },
+    {
+      "name": "Hamburger",
+      "is_vegetarian": false,
+      "description": "Beef patty"
+    },
+    {
+      "name": "Mushroom Risotto",
+      "is_vegetarian": true,
+      "description": "Arborio rice with mushrooms and parmesan"
+    },
+    {
+      "name": "Chicken Risotto",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Pasta Primavera",
+      "is_vegetarian": true,
+      "description": "Pasta with fresh vegetables"
+    },
+    {
+      "name": "Spaghetti Bolognese",
+      "is_vegetarian": false,
+      "description": "Contains ground beef"
+    },
+    {
+      "name": "Falafel Wrap",
+      "is_vegetarian": true,
+      "description": "Chickpea-based falafel with vegetables"
+    },
+    {
+      "name": "Chicken Wrap",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Caprese Salad",
+      "is_vegetarian": true,
+      "description": "Fresh mozzarella, tomatoes, and basil"
+    },
+    {
+      "name": "Grilled Salmon",
+      "is_vegetarian": false,
+      "description": "Fish dish"
+    },
+    {
+      "name": "Tofu Stir Fry",
+      "is_vegetarian": true,
+      "description": "Tofu with mixed vegetables"
+    },
+    {
+      "name": "Beef Stir Fry",
+      "is_vegetarian": false,
+      "description": "Contains beef"
+    },
+    {
+      "name": "Eggplant Parmesan",
+      "is_vegetarian": true,
+      "description": "Breaded eggplant with marinara and cheese"
+    },
+    {
+      "name": "Chicken Parmesan",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Vegetable Curry",
+      "is_vegetarian": true,
+      "description": "Mixed vegetables in curry sauce"
+    },
+    {
+      "name": "Chicken Curry",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Paneer Tikka",
+      "is_vegetarian": true,
+      "description": "Grilled Indian cottage cheese"
+    },
+    {
+      "name": "Chicken Tikka",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Hummus Plate",
+      "is_vegetarian": true,
+      "description": "Chickpea dip with pita bread"
+    },
+    {
+      "name": "Grilled Cheese Sandwich",
+      "is_vegetarian": true,
+      "description": "Melted cheese between bread"
+    },
+    {
+      "name": "BLT Sandwich",
+      "is_vegetarian": false,
+      "description": "Contains bacon"
+    },
+    {
+      "name": "French Fries",
+      "is_vegetarian": true,
+      "description": "Fried potatoes"
+    },
+    {
+      "name": "Onion Rings",
+      "is_vegetarian": true,
+      "description": "Battered and fried onions"
+    },
+    {
+      "name": "Mozzarella Sticks",
+      "is_vegetarian": true,
+      "description": "Breaded and fried mozzarella"
+    },
+    {
+      "name": "Buffalo Wings",
+      "is_vegetarian": false,
+      "description": "Chicken wings"
+    },
+    {
+      "name": "Garden Salad",
+      "is_vegetarian": true,
+      "description": "Mixed greens with vegetables"
+    },
+    {
+      "name": "Cobb Salad",
+      "is_vegetarian": false,
+      "description": "Contains chicken and bacon"
+    },
+    {
+      "name": "Minestrone Soup",
+      "is_vegetarian": true,
+      "description": "Italian vegetable soup"
+    },
+    {
+      "name": "Chicken Noodle Soup",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Tomato Soup",
+      "is_vegetarian": true,
+      "description": "Pureed tomato soup"
+    },
+    {
+      "name": "Clam Chowder",
+      "is_vegetarian": false,
+      "description": "Contains clams"
+    },
+    {
+      "name": "Mac and Cheese",
+      "is_vegetarian": true,
+      "description": "Pasta with cheese sauce"
+    },
+    {
+      "name": "Spinach Artichoke Dip",
+      "is_vegetarian": true,
+      "description": "Creamy spinach and artichoke dip"
+    },
+    {
+      "name": "Nachos Supreme",
+      "is_vegetarian": false,
+      "description": "Usually contains ground beef"
+    },
+    {
+      "name": "Cheese Nachos",
+      "is_vegetarian": true,
+      "description": "Tortilla chips with melted cheese"
+    },
+    {
+      "name": "Bean Burrito",
+      "is_vegetarian": true,
+      "description": "Beans, cheese, and rice in tortilla"
+    },
+    {
+      "name": "Beef Burrito",
+      "is_vegetarian": false,
+      "description": "Contains beef"
+    },
+    {
+      "name": "Cheese Quesadilla",
+      "is_vegetarian": true,
+      "description": "Melted cheese in tortilla"
+    },
+    {
+      "name": "Chicken Quesadilla",
+      "is_vegetarian": false,
+      "description": "Contains chicken"
+    },
+    {
+      "name": "Vegetable Spring Rolls",
+      "is_vegetarian": true,
+      "description": "Vegetables wrapped in rice paper"
+    },
+    {
+      "name": "Pork Dumplings",
+      "is_vegetarian": false,
+      "description": "Contains pork"
+    },
+    {
+      "name": "Vegetable Dumplings",
+      "is_vegetarian": true,
+      "description": "Vegetables in dumpling wrapper"
+    },
+    {
+      "name": "Pad Thai",
+      "is_vegetarian": false,
+      "description": "Usually contains shrimp or chicken, and fish sauce"
+    },
+    {
+      "name": "Vegetable Pad Thai",
+      "is_vegetarian": true,
+      "description": "Vegetables and tofu, no fish sauce"
+    },
+    {
+      "name": "Tempeh Bowl",
+      "is_vegetarian": true,
+      "description": "Fermented soybean protein with vegetables"
+    },
+    {
+      "name": "Poke Bowl",
+      "is_vegetarian": false,
+      "description": "Contains raw fish"
+    }
+  ]
+}

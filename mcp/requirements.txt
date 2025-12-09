@@ -1,0 +1,28 @@
+# Web Framework
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+
+# Pin numpy FIRST to avoid chromadb pulling in numpy 2.0
+numpy==1.26.4
+
+# LLM Integration
+ollama==0.1.7
+
+# Vector Database & Embeddings
+chromadb==0.4.24
+sentence-transformers==2.3.1
+
+# Validation & Models
+pydantic==2.6.1
+pydantic-settings==2.2.1
+
+# Observability
+structlog==24.1.0
+
+# Utilities
+python-dotenv==1.0.1
+
+# Testing
+pytest==8.0.1
+pytest-asyncio==0.23.5
+pytest-cov==4.1.0
