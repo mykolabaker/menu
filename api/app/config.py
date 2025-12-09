@@ -7,6 +7,7 @@ class Settings(BaseSettings):
 
     # MCP Server
     mcp_server_url: str = "http://mcp:8001"
+    mcp_timeout_seconds: float = 300.0
 
     # Image Processing
     max_images: int = 5

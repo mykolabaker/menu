@@ -82,3 +82,10 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+*.md
+!README.md
+!REQUIREMENTS.md
+
+.*
+!.env.example

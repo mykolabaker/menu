@@ -5,7 +5,6 @@ from ..models.requests import ReviewRequest
 from ..models.responses import ProcessMenuResponse
 from ..models.menu_item import VegetarianItem
 from ..services.review_store import review_store
-from ..utils.exceptions import ReviewNotFoundError
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -42,7 +41,12 @@ async def submit_review(body: ReviewRequest) -> ProcessMenuResponse:
     # Add confident items
     for item in stored_result.get("confident_items", []):
         vegetarian_items.append(
-            VegetarianItem(name=item["name"], price=item["price"])
+            VegetarianItem(
+                name=item["name"],
+                price=item["price"],
+                confidence=item.get("confidence", 1.0),
+                reasoning=item.get("reasoning", "Previously classified with high confidence"),
+            )
         )
 
     # Process uncertain items with corrections
@@ -54,7 +58,12 @@ async def submit_review(body: ReviewRequest) -> ProcessMenuResponse:
             if corrections_map[item_key]:
                 # User confirmed as vegetarian
                 vegetarian_items.append(
-                    VegetarianItem(name=item["name"], price=item["price"])
+                    VegetarianItem(
+                        name=item["name"],
+                        price=item["price"],
+                        confidence=1.0,
+                        reasoning="Confirmed vegetarian by human review",
+                    )
                 )
             # If false, we just don't add it
         else:

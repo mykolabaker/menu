@@ -36,5 +36,3 @@ class NeedsReviewResponse(BaseModel):
     confident_items: list[ConfidentItem] = Field(default_factory=list)
     uncertain_items: list[UncertainItem] = Field(default_factory=list)
     partial_sum: float = Field(..., ge=0)
-
-

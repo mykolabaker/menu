@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app/ ./app/
 
+# Copy tests for e2e testing
+COPY tests/ ./tests/
+
 # Expose port
 EXPOSE 8000
 

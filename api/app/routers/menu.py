@@ -5,10 +5,9 @@ from fastapi import APIRouter, File, UploadFile, Request, HTTPException
 from PIL import Image
 import structlog
 
-from ..config import get_settings
 from ..models.requests import ProcessMenuBase64Request
-from ..models.responses import ProcessMenuResponse, NeedsReviewResponse
-from ..models.menu_item import MenuItem, VegetarianItem
+from ..models.responses import ProcessMenuResponse, NeedsReviewResponse, ConfidentItem, UncertainItem
+from ..models.menu_item import VegetarianItem
 from ..services.ocr_service import ocr_service
 from ..services.text_parser import text_parser
 from ..services.mcp_client import mcp_client
@@ -175,16 +174,16 @@ async def _process_images(
             status="needs_review",
             request_id=request_id,
             confident_items=[
-                {"name": item["name"], "price": item["price"], "confidence": item["confidence"]}
+                ConfidentItem(name=item["name"], price=item["price"], confidence=item["confidence"])
                 for item in mcp_result.get("confident_items", [])
             ],
             uncertain_items=[
-                {
-                    "name": item["name"],
-                    "price": item["price"],
-                    "confidence": item["confidence"],
-                    "evidence": item.get("evidence", []),
-                }
+                UncertainItem(
+                    name=item["name"],
+                    price=item["price"],
+                    confidence=item["confidence"],
+                    evidence=item.get("evidence", []),
+                )
                 for item in mcp_result.get("uncertain_items", [])
             ],
             partial_sum=mcp_result.get("partial_sum", 0.0),

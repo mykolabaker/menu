@@ -3,7 +3,6 @@ import structlog
 from typing import NamedTuple
 
 from ..models.menu_item import MenuItem
-from ..utils.exceptions import ParsingError
 
 logger = structlog.get_logger()
 
@@ -135,6 +134,7 @@ class TextParser:
         return MenuItem(
             name=name,
             price=price_match.value,
+            description=None,
             category=category,
         )
 
