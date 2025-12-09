@@ -15,15 +15,23 @@ services:
     networks:
       - menu-network
     restart: unless-stopped
-    deploy:
-      replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # Note: Single instance for API to ensure HITL review store consistency
+    # For production, use Redis/database for review store and enable replicas
 
   mcp:
     build:
       context: ./mcp
       dockerfile: Dockerfile
-    ports:
-      - "8001:8001"
+    # Internal service - no host port mapping needed
+    # Access via Docker network at mcp:8001
+    expose:
+      - "8001"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - LLM_MODEL=${LLM_MODEL:-llama3}
@@ -39,11 +47,18 @@ services:
     networks:
       - menu-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     deploy:
       replicas: 2
 
   ollama:
     image: ollama/ollama:latest
+    # Expose for local development/debugging
     ports:
       - "11434:11434"
     volumes:

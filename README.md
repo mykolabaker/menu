@@ -90,7 +90,7 @@ curl -X POST http://localhost:8000/process-menu \
 
 **Base64 JSON:**
 ```bash
-curl -X POST http://localhost:8000/process-menu \
+curl -X POST http://localhost:8000/process-menu-base64 \
   -H "Content-Type: application/json" \
   -d '{"images": ["'$(base64 -w0 menu1.jpg)'"]}'
 ```
@@ -253,6 +253,25 @@ menu/
 5. **Ollama for local LLM**: No API costs, fully offline capable, easy Docker integration.
 
 6. **In-memory review store**: Simple for MVP, can migrate to Redis/database for production.
+
+## Known Limitations
+
+### HITL Review Store
+
+The current implementation uses an in-memory store for pending HITL reviews. This has important implications:
+
+- **Single API instance required**: The API service must run as a single instance to ensure review requests are routed to the same process that stored the pending review. The docker-compose.yml is configured accordingly.
+- **No persistence**: Pending reviews are lost on API restart. For production, consider:
+  - Using Redis for shared state across instances
+  - Using a database (PostgreSQL, MongoDB) for persistence
+  - Implementing sticky sessions if using multiple API instances
+
+### Parallel Classification
+
+Menu items are classified in parallel using a thread pool (4 workers). For very large menus (50+ items), consider:
+- Increasing the thread pool size via configuration
+- Implementing request queuing for burst protection
+- Adding rate limiting for LLM calls
 
 ## Error Handling
 

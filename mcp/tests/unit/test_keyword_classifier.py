@@ -95,7 +95,13 @@ class TestSpecificIngredients:
         assert result.is_vegetarian is True
 
     def test_egg_based(self, classifier):
-        """Test egg dishes (eggs are vegetarian)."""
-        # Note: Our classifier doesn't explicitly handle eggs
-        # as they're in a gray area for some vegetarians
-        pass  # This would depend on specific requirements
+        """Test egg dishes (eggs are vegetarian per requirements)."""
+        egg_dishes = [
+            "Eggs Benedict",
+            "Vegetable Omelette",
+            "Spinach Frittata",
+            "Quiche Lorraine",  # Note: Traditional has bacon, but keyword gives veg signal
+        ]
+        for dish in egg_dishes:
+            result = classifier.classify(dish)
+            assert result.is_vegetarian is True, f"Failed for {dish}"

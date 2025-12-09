@@ -116,6 +116,24 @@ async def list_tools():
     }
 
 
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Health check endpoint for load balancers and orchestration."""
+    from .services.llm_classifier import llm_classifier
+
+    llm_available = llm_classifier.is_available()
+
+    return {
+        "status": "healthy" if llm_available else "degraded",
+        "service": "mcp",
+        "version": "1.0.0",
+        "dependencies": {
+            "ollama": "available" if llm_available else "unavailable",
+            "rag": "available",
+        },
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

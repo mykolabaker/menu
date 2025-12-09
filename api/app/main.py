@@ -80,6 +80,16 @@ app.include_router(menu.router, tags=["Menu"])
 app.include_router(review.router, tags=["Review"])
 
 
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Health check endpoint for load balancers and orchestration."""
+    return {
+        "status": "healthy",
+        "service": "api",
+        "version": "1.0.0",
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

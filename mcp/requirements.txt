@@ -18,6 +18,7 @@ pydantic-settings==2.2.1
 
 # Observability
 structlog==24.1.0
+langsmith==0.1.17
 
 # Utilities
 python-dotenv==1.0.1

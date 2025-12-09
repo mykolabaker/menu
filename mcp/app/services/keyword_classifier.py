@@ -13,8 +13,9 @@ class KeywordClassifier:
     VEGETARIAN_KEYWORDS = [
         # Explicit markers
         "vegetarian", "veggie", "vegan", "plant-based", "meatless",
-        # Proteins
+        # Proteins (vegetarian-friendly)
         "tofu", "tempeh", "seitan", "paneer", "halloumi",
+        "egg", "eggs", "omelette", "omelet", "frittata", "quiche",
         # Legumes
         "beans", "lentils", "chickpea", "hummus", "falafel", "dal", "daal",
         # Vegetables (as main ingredient indicators)
@@ -33,7 +34,7 @@ class KeywordClassifier:
         "chicken", "turkey", "duck", "poultry", "wing", "wings",
         # Red meat
         "beef", "steak", "lamb", "pork", "veal", "venison", "bison",
-        "burger", "meatball", "meatloaf", "meat",
+        "meatball", "meatloaf", "meat",
         # Processed meats
         "bacon", "ham", "sausage", "salami", "pepperoni", "prosciutto",
         "chorizo", "pastrami", "corned beef",

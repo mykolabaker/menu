@@ -121,13 +121,28 @@ class TestClassifyAndCalculateTool:
 
 
 class TestHealthEndpoint:
-    def test_health_check(self, client):
-        """Test MCP server health check."""
+    @patch("app.main.llm_classifier")
+    def test_health_check_healthy(self, mock_llm, client):
+        """Test MCP server health check when Ollama is available."""
+        mock_llm.is_available.return_value = True
+
         response = client.get("/health")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
         assert data["service"] == "mcp"
+        assert data["dependencies"]["ollama"] == "available"
+
+    @patch("app.main.llm_classifier")
+    def test_health_check_degraded(self, mock_llm, client):
+        """Test MCP server health check when Ollama is unavailable."""
+        mock_llm.is_available.return_value = False
+
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "degraded"
+        assert data["dependencies"]["ollama"] == "unavailable"
 
 
 class TestToolsEndpoint:

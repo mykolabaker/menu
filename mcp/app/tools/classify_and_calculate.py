@@ -1,4 +1,8 @@
+import asyncio
+import os
 import time
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import structlog
 
 from ..config import get_settings
@@ -16,6 +20,33 @@ from ..services.rag_service import rag_service
 from ..services.calculator import calculator
 
 logger = structlog.get_logger()
+
+# Thread pool for CPU-bound classification tasks
+_executor = ThreadPoolExecutor(max_workers=4)
+
+# Configure Langsmith if API key is set
+_settings = get_settings()
+if _settings.langsmith_api_key:
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = _settings.langsmith_api_key
+    os.environ["LANGCHAIN_PROJECT"] = _settings.langsmith_project
+
+
+@contextmanager
+def _langsmith_trace(name: str, request_id: str, metadata: dict = None):
+    """Context manager for Langsmith tracing when enabled."""
+    settings = get_settings()
+    if not settings.langsmith_api_key:
+        yield
+        return
+
+    try:
+        from langsmith import trace
+
+        with trace(name=name, metadata={"request_id": request_id, **(metadata or {})}):
+            yield
+    except ImportError:
+        yield
 
 
 class ClassifyAndCalculateTool:
@@ -45,12 +76,28 @@ class ClassifyAndCalculateTool:
 
         start_time = time.time()
 
-        # Classify each item
-        classifications: list[tuple[MenuItemInput, ClassificationResult]] = []
+        with _langsmith_trace(
+            "classify_and_calculate",
+            input_data.request_id,
+            {"items_count": len(input_data.menu_items)},
+        ):
+            # Classify items in parallel using thread pool for blocking operations
+            loop = asyncio.get_event_loop()
+            tasks = [
+                loop.run_in_executor(
+                    _executor,
+                    self._classify_item,
+                    item,
+                    input_data.request_id,
+                )
+                for item in input_data.menu_items
+            ]
+            results = await asyncio.gather(*tasks)
 
-        for item in input_data.menu_items:
-            result = self._classify_item(item, input_data.request_id)
-            classifications.append((item, result))
+        classifications: list[tuple[MenuItemInput, ClassificationResult]] = [
+            (item, result)
+            for item, result in zip(input_data.menu_items, results)
+        ]
 
         # Separate confident and uncertain items
         confident_veg: list[VegetarianItemOutput] = []

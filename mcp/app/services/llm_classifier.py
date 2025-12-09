@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import ollama
 import structlog
@@ -7,6 +8,34 @@ from ..config import get_settings
 from ..models.classification import LLMClassificationResponse, RAGEvidence
 
 logger = structlog.get_logger()
+
+# Configure Langsmith if API key is set
+_settings = get_settings()
+if _settings.langsmith_api_key:
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = _settings.langsmith_api_key
+    os.environ["LANGCHAIN_PROJECT"] = _settings.langsmith_project
+
+
+def _trace_llm_call(func):
+    """Decorator to trace LLM calls with Langsmith when enabled."""
+    def wrapper(*args, **kwargs):
+        settings = get_settings()
+        if not settings.langsmith_api_key:
+            return func(*args, **kwargs)
+
+        try:
+            from langsmith import traceable
+
+            @traceable(name="llm_classify", run_type="llm")
+            def traced_func(*a, **kw):
+                return func(*a, **kw)
+
+            return traced_func(*args, **kwargs)
+        except ImportError:
+            return func(*args, **kwargs)
+
+    return wrapper
 
 
 CLASSIFICATION_PROMPT = """You are a vegetarian dish classifier. Analyze the following dish and determine if it is vegetarian.

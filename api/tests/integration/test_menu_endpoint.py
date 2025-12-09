@@ -92,7 +92,7 @@ class TestProcessMenuEndpoint:
             client = TestClient(app)
 
             response = client.post(
-                "/process-menu",
+                "/process-menu-base64",
                 json={"images": [b64_image]},
             )
 
@@ -103,7 +103,7 @@ class TestProcessMenuEndpoint:
 
     def test_process_menu_no_images(self, client):
         """Test error when no images provided."""
-        response = client.post("/process-menu", json={"images": []})
+        response = client.post("/process-menu", files=[])
         assert response.status_code == 400
 
     def test_process_menu_too_many_images(self, client, sample_image_bytes):
